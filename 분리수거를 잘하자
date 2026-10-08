@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>친절한 분리수거 교실</title>
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            background-color: #EBF4E8;
+            color: #2D3748;
+        }
+
+        #app {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            padding: 16px;
+            gap: 12px;
+            position: relative;
+        }
+
+        /* === 0. 시작 화면 (Intro) === */
+        .intro-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #EBF4E8;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .main-title {
+            font-size: 30px;
+            font-weight: 800;
+            color: #2C3E50;
+            margin-top: 20px;
+            margin-bottom: 24px;
+            line-height: 1.3;
+        }
+
+        .intro-avatar {
+            width: 120px;
+            height: 120px;
+            background-color: #FEFCBF;
+            border: 3px solid #D69E2E;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            font-size: 60px;
+        }
+
+        .btn-start {
+            width: 80%;
+            max-width: 280px;
+            height: 56px;
+            background-color: #38A169;
+            color: white;
+            border: none;
+            border-radius: 18px;
+            font-size: 20px;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(56, 161, 105, 0.4);
+            cursor: pointer;
+        }
+
+        /* === 0-1. 사용법 안내 모달 (Tutorial Guide) === */
+        .tutorial-modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .tutorial-box {
+            background: #FFFFFF;
+            width: 100%;
+            max-width: 380px;
+            border-radius: 24px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .tutorial-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #2D3748;
+            margin-bottom: 16px;
+        }
+
+        .tutorial-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            text-align: left;
+            margin-bottom: 24px;
+        }
+
+        .step-item {
+            background: #F7FAFC;
+            border: 1px solid #E2E8F0;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #4A5568;
+            line-height: 1.4;
+        }
+
+        .btn-tutorial-close {
+            width: 100%;
+            height: 52px;
+            background-color: #3182CE;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* === 1. 캐릭터 & 말풍선 (선생님 공간) === */
+        .character-section {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #FFFFFF;
+            border-radius: 20px;
+            padding: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            height: 28%;
+            min-height: 160px;
+        }
+
+        .pixel-character {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 90px;
+        }
+
+        .avatar-box {
+            width: 76px;
+            height: 76px;
+            background-color: #FEFCBF;
+            border: 2px solid #D69E2E;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 40px;
+        }
+
+        .char-name {
+            margin-top: 6px;
+            font-size: 15px;
+            font-weight: 800;
+            color: #2D3748;
+            background-color: #EDF2F7;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .speech-bubble {
+            position: relative;
+            background: #FFFBEB;
+            border: 3px solid #F6AD55;
+            border-radius: 18px;
+            padding: 16px;
+            flex: 1;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .speech-bubble::before {
+            content: '';
+            position: absolute;
+            left: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 6px 10px 6px 0;
+            border-style: solid;
+            border-color: transparent #F6AD55 transparent transparent;
+        }
+
+        .dialog-text {
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.5;
+            color: #1A202C;
+            word-break: keep-all;
+        }
+
+        /* === 2. 메인 콘텐츠 === */
+        .main-content {
+            flex: 1;
+            background: #FFFFFF;
+            border-radius: 20px;
+            padding: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .study-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            height: 100%;
+        }
+
+        .item-card {
+            background-color: #F8FAFC;
+            border: 2px solid #EDF2F7;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            gap: 14px;
+            cursor: pointer;
+            flex: 1;
+            transition: all 0.3s ease;
+        }
+
+        .item-card.learned {
+            border-color: #38A169;
+            background-color: #F0FFF4;
+        }
+
+        .item-card .card-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            width: 100%;
+        }
+
+        .item-card .card-result {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .item-card.learned .card-info {
+            display: none;
+        }
+
+        .item-card.learned .card-result {
+            display: flex;
+        }
+
+        .result-title {
+            font-size: 17px;
+            font-weight: 800;
+            color: #276749;
+            margin-bottom: 4px;
+        }
+
+        .result-desc {
+            font-size: 15px;
+            font-weight: 600;
+            color: #2D3748;
+            line-height: 1.4;
+        }
+
+        .item-icon {
+            font-size: 32px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .item-label {
+            font-size: 19px;
+            font-weight: 700;
+            color: #2D3748;
+        }
+
+        /* 연습 모드 영역 (네모 상자 완전 제거, 순수 이모지+이름표) */
+        .practice-container {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .interactive-zone {
+            width: 100%;
+            height: 52%;
+            position: relative;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .drag-target {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            touch-action: none;
+            cursor: pointer;
+            z-index: 10;
+            gap: 8px;
+            background: transparent; /* 네모 상자 아예 없음 */
+            border: none;
+        }
+
+        .drag-target .big-emoji {
+            font-size: 72px;
+            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.18));
+        }
+
+        .drag-target .item-name-tag {
+            background-color: #EDF2F7;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #2D3748;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            white-space: nowrap;
+        }
+
+        /* 세면대 디자인 */
+        .sink-box {
+            width: 96px;
+            height: 96px;
+            background-color: #EBF8FF;
+            border: 3px solid #3182CE;
+            border-radius: 22px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #2B6CB0;
+            position: absolute;
+            left: 5px;
+            top: 20%;
+            box-shadow: 0 4px 8px rgba(49, 130, 206, 0.15);
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .bins-wrapper {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 100%;
+            margin-top: auto;
+        }
+
+        .bin-box {
+            height: 90px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 15px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 4px;
+            line-height: 1.3;
+        }
+
+        .bin-general { background-color: #718096; }
+        .bin-recycle { background-color: #3182CE; }
+        .bin-food { background-color: #D69E2E; }
+
+        /* === 4. 완료 축하 엔딩 화면 === */
+        .ending-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+            height: 100%;
+            gap: 18px;
+            padding: 10px;
+        }
+
+        .ending-emoji {
+            font-size: 76px;
+            animation: bounce 1s infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+
+        .ending-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: #276749;
+        }
+
+        .ending-desc {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2D3748;
+            line-height: 1.6;
+            word-break: keep-all;
+        }
+
+        .btn-action {
+            width: 100%;
+            height: 56px;
+            background-color: #38A169;
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 19px;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(56, 161, 105, 0.3);
+            cursor: pointer;
+        }
+
+        .btn-action:disabled {
+            background-color: #CBD5E0;
+            box-shadow: none;
+            color: #A0AEC0;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <!-- 0. 시작 화면 -->
+    <div id="intro-screen" class="intro-screen">
+        <div class="intro-avatar">👩‍🏫</div>
+        <h1 class="main-title">친절한 분리수거 교실</h1>
+        <button class="btn-start" onclick="openTutorial()">배워보기 시작</button>
+    </div>
+
+    <!-- 0-1. 사용법 안내 모달 -->
+    <div id="tutorial-modal" class="tutorial-modal">
+        <div class="tutorial-box">
+            <h2 class="tutorial-title">📖 이렇게 이용해보세요!</h2>
+            <div class="tutorial-steps">
+                <div class="step-item"><b>1단계:</b> 아래 목록에서 항목들을 눌러 올바른 분리수거 방법을 미리 학습해요.</div>
+                <div class="step-item"><b>2단계:</b> 4가지를 모두 익히면 <b>[실전 연습하기]</b> 버튼이 활성화돼요.</div>
+                <div class="step-item"><b>3단계:</b> 물건을 <b>터치해서 분리하거나 찌그러뜨린 뒤</b>, 세면대에 헹구고 알맞은 쓰레기통으로 드래그해 쏙 넣어 배출하세요!</div>
+            </div>
+            <button class="btn-tutorial-close" onclick="startApp()">알겠어요, 시작하기!</button>
+        </div>
+    </div>
+
+    <!-- 1. 캐릭터 & 말풍선 (선생님 가이드 영역) -->
+    <div class="character-section">
+        <div class="pixel-character">
+            <div class="avatar-box">👩‍🏫</div>
+            <span class="char-name">선생님</span>
+        </div>
+        <div class="speech-bubble">
+            <p class="dialog-text" id="dialog">
+                안녕! 아래 항목들을 눌러서 올바른 분리수거 방법을 먼저 확인해봐!
+            </p>
+        </div>
+    </div>
+
+    <!-- 2. 메인 화면 -->
+    <div class="main-content">
+        <!-- 학습 모드 -->
+        <div class="study-grid" id="study-view">
+            <div class="item-card" id="card-straw" onclick="learnItem('straw')">
+                <div class="card-info">
+                    <div class="item-icon">🥤</div>
+                    <span class="item-label">플라스틱 빨대</span>
+                </div>
+                <div class="card-result">
+                    <span class="result-title">🗑️ 일반 쓰레기로 버리기</span>
+                    <span class="result-desc">크기가 작고 가벼워 재활용이 어려우므로 일반쓰레기로 버려요.</span>
+                </div>
+            </div>
+
+            <div class="item-card" id="card-glass" onclick="learnItem('glass')">
+                <div class="card-info">
+                    <div class="item-icon">🍾</div>
+                    <span class="item-label">갈색 유리병</span>
+                </div>
+                <div class="card-result">
+                    <span class="result-title">♻️ 뚜껑 먼저 열고 + 헹구기</span>
+                    <span class="result-desc">뚜껑을 열어 따로 버리고, 병 내부를 헹군 뒤 재활용해요.</span>
+                </div>
+            </div>
+
+            <div class="item-card" id="card-can" onclick="learnItem('can')">
+                <div class="card-info">
+                    <div class="item-icon">🥫</div>
+                    <span class="item-label">음료수 캔</span>
+                </div>
+                <div class="card-result">
+                    <span class="result-title">♻️ 헹구고 + 찌그러뜨리기</span>
+                    <span class="result-desc">내용물을 깨끗이 헹군 후 찌그러뜨려 재활용해요.</span>
+                </div>
+            </div>
+
+            <div class="item-card" id="card-snack" onclick="learnItem('snack')">
+                <div class="card-info">
+                    <div class="item-icon">🍪🫓</div>
+                    <span class="item-label">먹다 남은 과자</span>
+                </div>
+                <div class="card-result">
+                    <span class="result-title">🗑️ 남은 과자는 음식물, 봉지는 일반!</span>
+                    <span class="result-desc">남은 과자는 음식물쓰레기통, 포장 봉지는 일반쓰레기로 분리해요.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 연습 모드 -->
+        <div class="practice-container" id="practice-view">
+            <div class="interactive-zone">
+                <div class="sink-box" id="sink-box">
+                    💧<br>세면대<br>(물로 헹구기)
+                </div>
+
+                <div id="drag-item" class="drag-target">
+                    <div id="drag-emoji" class="big-emoji"></div>
+                    <div id="drag-name" class="item-name-tag">아이템</div>
+                </div>
+
+                <!-- 부속품 (유리병 뚜껑, 과자 봉지 등) -->
+                <div id="sub-item" class="drag-target" style="display:none;">
+                    <div id="sub-emoji" class="big-emoji"></div>
+                    <div id="sub-name" class="item-name-tag">보조 아이템</div>
+                </div>
+            </div>
+
+            <div class="bins-wrapper">
+                <div class="bin-box bin-general" id="bin-general">
+                    🗑️<br>일반 쓰레기
+                </div>
+                <div class="bin-box bin-food" id="bin-food">
+                    🍲<br>음식물 쓰레기
+                </div>
+                <div class="bin-box bin-recycle" id="bin-recycle">
+                    ♻️<br>재활용 배출
+                </div>
+            </div>
+        </div>
+
+        <!-- 완료 엔딩 화면 -->
+        <div class="ending-screen" id="ending-view">
+            <div class="ending-emoji">🌟🎉</div>
+            <h2 class="ending-title">모든 실습을 완벽하게 마쳤어요!</h2>
+            <p class="ending-desc">
+                참 잘했어요! 오늘 배운 올바른 분리수거 방법을 꼭 기억하고, <br>
+                앞으로도 일상 속에서 열심히 실천해 주세요! 💚
+            </p>
+        </div>
+    </div>
+
+    <!-- 3. 하단 버튼 -->
+    <button id="action-btn" class="btn-action" disabled onclick="startPractice()">
+        실전 연습하기 (0/4 완료)
+    </button>
+</div>
+
+<script>
+    const learnedState = { straw: false, glass: false, can: false, snack: false };
+    let currentQuizIndex = 0;
+    
+    let isRinsed = false;
+    let isActionDone = false; // 뚜껑 열기, 찌그러뜨리기 완료 여부
+
+    const quizList = [
+        { key: 'straw', name: '플라스틱 빨대', type: 'general' },
+        { key: 'glass', name: '갈색 유리병', type: 'recycle' },
+        { key: 'can', name: '음료수 캔', type: 'recycle' },
+        { key: 'snack', name: '먹다 남은 과자', type: 'general' }
+    ];
+
+    const dialogEl = document.getElementById('dialog');
+    const actionBtn = document.getElementById('action-btn');
+    const studyView = document.getElementById('study-view');
+    const practiceView = document.getElementById('practice-view');
+    const endingView = document.getElementById('ending-view');
+    const dragItem = document.getElementById('drag-item');
+    const subItem = document.getElementById('sub-item');
+    const dragEmoji = document.getElementById('drag-emoji');
+    const dragName = document.getElementById('drag-name');
+    const subEmoji = document.getElementById('sub-emoji');
+    const subName = document.getElementById('sub-name');
+
+    function openTutorial() {
+        document.getElementById('tutorial-modal').style.display = 'flex';
+    }
+
+    function startApp() {
+        document.getElementById('tutorial-modal').style.display = 'none';
+        document.getElementById('intro-screen').style.display = 'none';
+    }
+
+    function learnItem(key) {
+        if (!learnedState[key]) {
+            learnedState[key] = true;
+            document.getElementById(`card-${key}`).classList.add('learned');
+        }
+
+        const count = Object.values(learnedState).filter(Boolean).length;
+        if (count === 4) {
+            actionBtn.disabled = false;
+            actionBtn.innerText = "실전 연습하기 시작!";
+            dialogEl.innerHTML = "모두 잘 익혔어! 이제 아래 버튼을 눌러 실전 <b>연습</b>을 시작해보자!";
+        } else {
+            actionBtn.innerText = `실전 연습하기 (${count}/4 완료)`;
+            dialogEl.innerHTML = `좋아! 올바른 방법을 잘 기억해둬. (${count}/4 완료)`;
+        }
+    }
+
+    function startPractice() {
+        studyView.style.display = 'none';
+        practiceView.style.display = 'flex';
+        actionBtn.style.display = 'none';
+        
+        loadQuiz();
+        setupDragAndDrop(dragItem, onDragMainEnd);
+        setupDragAndDrop(subItem, onDragSubEnd);
+    }
+
+    function loadQuiz() {
+        if (currentQuizIndex < quizList.length) {
+            const current = quizList[currentQuizIndex];
+            
+            isRinsed = false;
+            isActionDone = false;
+            subItem.style.display = 'none';
+            dragItem.style.display = 'flex';
+            resetPosition(dragItem);
+            resetPosition(subItem);
+
+            if (current.key === 'straw') {
+                dragEmoji.innerText = '🥤';
+                dragName.innerText = '플라스틱 빨대';
+                dialogEl.innerHTML = "📌 <b>플라스틱 빨대:</b> 올바른 쓰레기통으로 드래그해 버려주세요!";
+            } else if (current.key === 'glass') {
+                dragEmoji.innerText = '🍾';
+                dragName.innerText = '갈색 유리병';
+                dialogEl.innerHTML = "📌 <b>갈색 유리병:</b> 먼저 <b>터치해서 뚜껑을 열고</b>, 세면대에 헹군 뒤 재활용함에 버려주세요!";
+            } else if (current.key === 'can') {
+                dragEmoji.innerText = '🥫';
+                dragName.innerText = '음료수 캔';
+                dialogEl.innerHTML = "📌 <b>음료수 캔:</b> 세면대로 끌어가 <b>헹구고</b>, 터치해서 <b>찌그러뜨린 뒤</b> 재활용함에 버려주세요!";
+            } else if (current.key === 'snack') {
+                // 처음부터 과자와 과자 봉지(껍데기)가 나란히 등장
+                dragEmoji.innerText = '🍪';
+                dragName.innerText = '남은 과자';
+                
+                subItem.style.display = 'flex';
+                subItem.style.top = '20%';
+                subItem.style.left = 'calc(65%)';
+                subEmoji.innerText = '🫓';
+                subName.innerText = '과자 봉지';
+                
+                dialogEl.innerHTML = "📌 <b>먹다 남은 과자:</b> 이미 분리되어 있어요! 각각 알맞은 쓰레기통으로 드래그해 버려주세요!";
+                isActionDone = true; // 과자는 처음부터 분리된 상태
+            }
+        } else {
+            // 모든 미션 완료 시 엔딩 화면 호출
+            practiceView.style.display = 'none';
+            document.getElementById('sink-box').style.display = 'none';
+            endingView.style.display = 'flex';
+            dialogEl.innerHTML = "✨ <b>수고했어요! 분리수거 마스터가 되었네요!</b>";
+        }
+    }
+
+    // 아이템 터치 상호작용 (유리병 뚜껑 열기, 캔 찌그러뜨리기)
+    dragItem.addEventListener('click', () => {
+        const current = quizList[currentQuizIndex];
+        if (current.key === 'glass' && !isActionDone) {
+            isActionDone = true;
+            dragEmoji.innerText = '🍾';
+            dragName.innerText = '유리병 (몸통)';
+            
+            subItem.style.display = 'flex';
+            subItem.style.top = '20%';
+            subItem.style.left = 'calc(65%)';
+            subEmoji.innerText = '🔘';
+            subName.innerText = '병뚜껑';
+
+            dialogEl.innerHTML = "👍 뚜껑을 분리했어요! 이제 <b>세면대에 헹군 뒤</b> 각각 [재활용 배출]에 버려주세요.";
+        } else if (current.key === 'can' && !isActionDone) {
+            isActionDone = true;
+            dragEmoji.innerText = '🥫';
+            dragEmoji.style.transform = 'scale(0.85) rotate(-10deg)';
+            dragName.innerText = '찌그러진 캔';
+            dialogEl.innerHTML = "👍 캔을 찌그러뜨렸어요! 이제 <b>[재활용 배출]</b>함으로 드래그해 버려주세요.";
+        }
+    });
+
+    function onDragMainEnd(targetType) {
+        const current = quizList[currentQuizIndex];
+
+        if (targetType === 'sink') {
+            if (current.key === 'straw' || current.key === 'snack') {
+                dialogEl.innerHTML = "이 물건은 물에 헹굴 필요가 없어요! 바로 버려주세요.";
+            } else {
+                isRinsed = true;
+                dialogEl.innerHTML = "💧 <b>깨끗이 헹궜어요!</b> 이제 올바른 쓰레기통으로 버려주세요.";
+            }
+            return;
+        }
+
+        // 품목별 검증
+        if (current.key === 'glass') {
+            if (!isActionDone) {
+                dialogEl.innerHTML = "⚠️ 버리기 전에 먼저 <b>유리병을 터치해서 뚜껑을 열어주세요!</b>";
+                return;
+            }
+            if (!isRinsed) {
+                dialogEl.innerHTML = "⚠️ 먼저 왼쪽 <b>세면대로 끌고 가서 깨끗이 헹궈주세요!</b>";
+                return;
+            }
+        }
+
+        if (current.key === 'can') {
+            if (!isRinsed) {
+                dialogEl.innerHTML = "⚠️ 먼저 왼쪽 <b>세면대로 끌고 가서 깨끗이 헹궈주세요!</b>";
+                return;
+            }
+            if (!isActionDone) {
+                dialogEl.innerHTML = "⚠️ 버리기 전에 캔을 <b>터치해서 찌그러뜨려주세요!</b>";
+                return;
+            }
+        }
+
+        // 정답 판정
+        let correctType = (current.key === 'snack') ? 'food' : current.type;
+        if (targetType === correctType) {
+            // 버리는 즉시 바로 사라지도록 처리
+            dragItem.style.display = 'none';
+
+            if (current.key === 'glass' || current.key === 'snack') {
+                if (subItem.style.display === 'none') {
+                    nextQuiz("참 잘했어요! 완벽하게 분리배출 성공! ✨");
+                } else {
+                    dialogEl.innerHTML = "좋아요! 이제 <b>나머지 조각도 올바른 곳에 버려주세요.</b>";
+                }
+            } else {
+                nextQuiz("참 잘했어요! 올바른 방법으로 버렸어요. ✨");
+            }
+        } else {
+            dialogEl.innerHTML = "<b>아차! 올바른 쓰레기통이 아니에요. 🤔 다시 확인해볼까요?</b>";
+        }
+    }
+
+    function onDragSubEnd(targetType) {
+        const current = quizList[currentQuizIndex];
+        let correctSub = (current.key === 'snack') ? 'general' : 'recycle';
+
+        if (targetType === correctSub) {
+            // 버리는 즉시 바로 사라지도록 처리
+            subItem.style.display = 'none';
+
+            if (dragItem.style.display === 'none') {
+                nextQuiz("모든 조각을 알맞은 쓰레기통에 쏙쏙 잘 버렸어요! ✨");
+            } else {
+                dialogEl.innerHTML = "잘했어요! 이제 <b>남은 물건도 올바른 통에 버려주세요.</b>";
+            }
+        } else {
+            dialogEl.innerHTML = "⚠️ 이 물건은 거기가 아니에요! 알맞은 쓰레기통을 골라주세요.";
+        }
+    }
+
+    function nextQuiz(msg) {
+        dialogEl.innerHTML = msg;
+        currentQuizIndex++;
+        setTimeout(loadQuiz, 1400);
+    }
+
+    function resetPosition(el) {
+        el.style.top = '20%';
+        el.style.left = 'calc(50% - 45px)';
+        el.style.transform = 'none';
+    }
+
+    function setupDragAndDrop(targetEl, callback) {
+        let active = false;
+        let currentX, currentY, initialX, initialY;
+        let xOffset = 0, yOffset = 0;
+
+        targetEl.addEventListener("touchstart", dragStart, false);
+        document.addEventListener("touchend", dragEnd, false);
+        document.addEventListener("touchmove", drag, false);
+
+        function dragStart(e) {
+            if (e.target.closest('#' + targetEl.id)) {
+                initialX = e.touches[0].clientX - xOffset;
+                initialY = e.touches[0].clientY - yOffset;
+                active = true;
+            }
+        }
+
+        function drag(e) {
+            if (active) {
+                e.preventDefault();
+                currentX = e.touches[0].clientX - initialX;
+                currentY = e.touches[0].clientY - initialY;
+                xOffset = currentX;
+                yOffset = currentY;
+
+                targetEl.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+            }
+        }
+
+        function dragEnd() {
+            if (!active) return;
+            active = false;
+
+            const itemBounds = targetEl.getBoundingClientRect();
+            const sinkBounds = document.getElementById('sink-box').getBoundingClientRect();
+            const genBin = document.getElementById('bin-general').getBoundingClientRect();
+            const foodBin = document.getElementById('bin-food').getBoundingClientRect();
+            const recBin = document.getElementById('bin-recycle').getBoundingClientRect();
+
+            if (isOverlapping(itemBounds, sinkBounds)) {
+                callback('sink');
+            } else if (isOverlapping(itemBounds, genBin)) {
+                callback('general');
+            } else if (isOverlapping(itemBounds, foodBin)) {
+                callback('food');
+            } else if (isOverlapping(itemBounds, recBin)) {
+                callback('recycle');
+            }
+
+            xOffset = 0;
+            yOffset = 0;
+            targetEl.style.transform = "none";
+        }
+
+        function isOverlapping(rect1, rect2) {
+            return !(rect1.right < rect2.left || 
+                     rect1.left > rect2.right || 
+                     rect1.bottom < rect2.top || 
+                     rect1.top > rect2.bottom);
+        }
+    }
+</script>
+</body>
+</html>
